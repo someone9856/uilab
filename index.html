@@ -1,0 +1,690 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>
+<title>UID Lab Record Notes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: calm dark notebook. Navy panels, soft off-white text, one teal accent, amber only for marks and outputs. */
+:root {
+  color-scheme: dark;
+  --page: #11162a;
+  --panel: #1a2140;
+  --panel2: #232c52;
+  --edge: #37426e;
+  --ink: #e6ebf8;
+  --muted: #a6b1d6;
+  --accent: #7fd6c8;
+  --accent-ink: #0f2230;
+  --mark: #5c4a14;
+  --amber: #f2bd63;
+  --rose: #e48b97;
+  --codebg: #0e1328;
+  --codeink: #d3e0ff;
+  --font-head: "Bricolage Grotesque", "Trebuchet MS", sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-hand: "Kalam", "Comic Sans MS", cursive;
+  --font-mono: "IBM Plex Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--page); color: var(--ink);
+  font: 16px/1.65 var(--font-body);
+  padding-block: 0 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 920px; margin: 0 auto; }
+header.top { padding: 28px 0 14px; }
+header.top h1 { font: 700 clamp(1.7rem, 5vw, 2.4rem)/1.1 var(--font-head); margin: 0 0 6px; text-wrap: balance; }
+header.top p { margin: 0; color: var(--muted); }
+
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--panel); border: 1px solid var(--edge); border-radius: 12px;
+  padding: 10px; display: grid; gap: 8px; margin-bottom: 20px;
+}
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.tab {
+  flex: 1 1 0; min-width: 96px; cursor: pointer; border: 1px solid var(--edge); border-radius: 9px;
+  font: 600 1rem var(--font-body); padding: 9px 10px; color: var(--ink); background: var(--panel2);
+}
+.tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.chips a {
+  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; text-decoration: none;
+  font: 600 .9rem var(--font-body); color: var(--ink); background: var(--panel2); border: 1px solid var(--edge);
+}
+.chips a:hover { border-color: var(--accent); color: var(--accent); }
+.tool { margin-left: auto; display: flex; gap: 8px; align-items: center; font-size: .9rem; }
+.tool label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+.tool button { font: 500 .9rem var(--font-body); border-radius: 8px; border: 1px solid var(--edge); background: var(--panel2); color: var(--ink); padding: 4px 10px; cursor: pointer; }
+a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+
+.legend { font-size: .92rem; color: var(--muted); margin: 0 0 16px; }
+mark, .add { background: var(--mark); color: var(--ink); border-radius: 3px; padding: 0 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+body.noadd mark.off, body.noadd .add { background: none; padding: 0; }
+section[hidden] { display: none; }
+
+/* written sheet */
+.sheet {
+  background: var(--panel); border: 1px solid var(--edge); border-radius: 14px; margin: 0 0 26px;
+  display: grid; grid-template-columns: 96px minmax(0, 1fr); overflow: hidden; scroll-margin-top: 150px;
+}
+.margin { background: var(--panel2); border-right: 3px double var(--rose); padding: 16px 10px; font: 500 .9rem/1.5 var(--font-body); color: var(--muted); }
+.margin b { display: block; font: 700 2.2rem/1 var(--font-head); color: var(--accent); margin-bottom: 10px; }
+.page { padding: 16px 20px 20px; min-width: 0; font: 400 1.12rem/1.75 var(--font-hand); }
+.page h3 { font: 700 1.4rem/1.25 var(--font-head); color: var(--accent); margin: 0 0 10px; text-wrap: balance; }
+.page h4 { font: 700 1rem var(--font-head); color: var(--amber); margin: 16px 0 4px; text-transform: uppercase; letter-spacing: .07em; }
+.page p { margin: 0 0 8px; }
+.page ul, .page ol { margin: 0 0 8px; padding-left: 1.4rem; }
+.page li { margin-bottom: 2px; }
+.result { border-top: 1px dashed var(--edge); margin-top: 16px; padding-top: 2px; }
+
+.codehead { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; font: 600 .85rem var(--font-body); color: var(--muted); }
+pre.code {
+  margin: 4px 0 12px; padding: 12px 14px; border-radius: 10px; overflow: auto; max-height: 380px;
+  background: var(--codebg); color: var(--codeink); border: 1px solid var(--edge); font: 400 .86rem/1.55 var(--font-mono); tab-size: 2;
+}
+.copy { font: 600 .8rem var(--font-body); border: 1px solid var(--edge); background: var(--panel2); color: var(--accent); border-radius: 8px; padding: 2px 10px; cursor: pointer; }
+
+/* execution + viva cards */
+.card { background: var(--panel); border: 1px solid var(--edge); border-radius: 14px; padding: 18px 20px 20px; margin: 0 0 24px; scroll-margin-top: 150px; }
+.card h3 { font: 700 1.3rem/1.25 var(--font-head); color: var(--accent); margin: 0 0 8px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.card h3 .n { background: var(--accent); color: var(--accent-ink); border-radius: 7px; padding: 0 10px; font-size: 1rem; }
+.meta { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 10px; }
+.pill { background: var(--panel2); border: 1px solid var(--edge); color: var(--muted); border-radius: 999px; padding: 1px 12px; font: 500 .85rem var(--font-body); }
+.card ol, .card ul { padding-left: 1.4rem; margin: 6px 0 10px; }
+.card li { margin-bottom: 5px; }
+.card li::marker { color: var(--accent); font-weight: 600; }
+.sub { font: 700 .92rem var(--font-head); color: var(--amber); text-transform: uppercase; letter-spacing: .07em; margin: 14px 0 2px; }
+.show { background: var(--mark); border-left: 4px solid var(--amber); border-radius: 8px; padding: 8px 12px; margin-top: 10px; }
+.show b { color: var(--amber); }
+code.k { font: 500 .88em var(--font-mono); background: var(--codebg); color: var(--codeink); padding: 1px 6px; border-radius: 4px; }
+.path { font: 500 .9rem var(--font-mono); background: var(--codebg); color: var(--accent); border-radius: 8px; padding: 6px 10px; display: block; overflow-x: auto; }
+.dlrow { display: none; gap: 10px; flex-wrap: wrap; align-items: center; margin: 10px 0 4px; }
+body.can-dl .dlrow { display: flex; }
+.dl { font: 600 .95rem var(--font-body); border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); border-radius: 9px; padding: 7px 14px; cursor: pointer; }
+.dl.alt { background: var(--panel2); color: var(--accent); }
+.dl:disabled { opacity: .6; cursor: progress; }
+.dlmsg { color: var(--amber); font-size: .9rem; }
+details.tool-steps { border: 1px solid var(--edge); border-radius: 10px; margin-top: 12px; }
+details.tool-steps summary { cursor: pointer; padding: 8px 14px; font-weight: 600; color: var(--amber); }
+details.tool-steps > div { padding: 0 14px 6px; }
+
+details.qa { background: var(--panel2); border: 1px solid var(--edge); border-radius: 10px; margin: 8px 0; }
+details.qa summary { cursor: pointer; padding: 9px 14px; font-weight: 600; list-style: none; display: flex; gap: 10px; }
+details.qa summary::-webkit-details-marker { display: none; }
+details.qa summary::before { content: "Q"; flex: none; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: .85rem; }
+details.qa[open] summary { border-bottom: 1px dashed var(--edge); }
+details.qa .ans { padding: 8px 14px 10px; color: var(--ink); }
+details.qa .ans::before { content: "Ans  "; font-weight: 700; color: var(--amber); }
+
+@media (max-width: 560px) {
+  .sheet { grid-template-columns: 1fr; }
+  .margin { border-right: 0; border-bottom: 3px double var(--rose); display: flex; gap: 14px; align-items: baseline; padding: 10px 14px; }
+  .margin b { margin: 0; font-size: 1.7rem; display: inline; }
+  .tool { margin-left: 0; width: 100%; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>UID Lab Record Notes</h1>
+    <p>CS23A34 User Interface Design &middot; Experiments 1 to 10 in your observation index order</p>
+  </header>
+
+  <div class="bar">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-t="written" aria-selected="true">1 &middot; Written</button>
+      <button class="tab" role="tab" data-t="exec" aria-selected="false">2 &middot; Execution</button>
+      <button class="tab" role="tab" data-t="viva" aria-selected="false">3 &middot; Viva</button>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="tool" id="tool"></div>
+  </div>
+
+  <section id="written"></section>
+  <section id="exec" hidden></section>
+  <section id="viva" hidden></section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+var FILES = {"Exp1 Good-Bad UI": {"index.html": "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n<title>Good UI and Bad UI<\/title>\n<style>\n  body { font-family: Arial; background: #eee; text-align: center; }\n  .row { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }\n  .phone { width: 260px; height: 420px; border: 3px solid #333; border-radius: 24px; overflow: hidden; text-align: left; }\n  .info { width: 260px; text-align: left; font-size: 14px; }\n\n  /* BAD UI: poor colours, mixed fonts, no alignment, no spacing */\n  .bad { background: #1faa00; padding: 6px; }\n  .bad h2 { color: red; font-family: \"Comic Sans MS\"; font-size: 30px; margin: 0; }\n  .bad input { width: 90%; font-family: \"Times New Roman\"; margin-left: 40px; }\n  .bad label { font-size: 8px; color: #7a7a7a; }\n  .bad button { width: 120px; height: 30px; font-family: Impact; }\n  .bad button + button { width: 60px; height: 50px; margin-left: -10px; }\n\n  /* GOOD UI: aligned, consistent, readable, spaced */\n  .good { background: #f7f9fc; padding: 24px; font-family: Arial; color: #222; }\n  .good h2 { margin: 0 0 20px; }\n  .good label { display: block; font-size: 14px; margin-bottom: 4px; }\n  .good input { width: 100%; padding: 10px; margin-bottom: 16px; box-sizing: border-box; }\n  .good button { width: 100%; padding: 12px; background: #1a73e8; color: #fff; border: 0; border-radius: 6px; font-size: 16px; }\n<\/style>\n<\/head>\n<body>\n<h1>Good UI vs Bad UI<\/h1>\n<div class=\"row\">\n  <div>\n    <h3>Bad UI<\/h3>\n    <div class=\"phone bad\">\n      <h2>Login<\/h2>\n      <label>user name<\/label><br><input>\n      <label>password<\/label><input type=\"password\"><br>\n      <button>Login<\/button><button>Help<\/button>\n    <\/div>\n    <div class=\"info\"><b>Why it is bad<\/b>\n      <ul><li>Red text on green: poor contrast<\/li><li>Three different fonts<\/li><li>Items not aligned<\/li><li>Buttons touch each other<\/li><li>Labels too small to read<\/li><\/ul><\/div>\n  <\/div>\n  <div>\n    <h3>Good UI<\/h3>\n    <div class=\"phone good\">\n      <h2>Login<\/h2>\n      <label>User name<\/label><input>\n      <label>Password<\/label><input type=\"password\">\n      <button>Login<\/button>\n    <\/div>\n    <div class=\"info\"><b>Why it is good<\/b>\n      <ul><li>Dark text on light background<\/li><li>One font<\/li><li>Everything aligned<\/li><li>Equal spacing<\/li><li>One clear button<\/li><\/ul><\/div>\n  <\/div>\n<\/div>\n<\/body>\n<\/html>\n"}, "Exp10 Data Visualization": {"index.html": "<!DOCTYPE html>\n<html>\n<head>\n<title>Inventory Charts<\/title>\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js\"><\/script>\n<style>\n  body { font-family: Arial; text-align: center; }\n  .box { width: 380px; display: inline-block; margin: 20px; }\n<\/style>\n<\/head>\n<body>\n<h2>Inventory Management - Data Visualization<\/h2>\n<div class=\"box\"><canvas id=\"pie\"><\/canvas><\/div>\n<div class=\"box\"><canvas id=\"bar\"><\/canvas><\/div>\n\n<script>\nvar items  = [\"Laptops\", \"Phones\", \"Tablets\", \"Monitors\"];\nvar stock  = [40, 65, 25, 30];\nvar colors = [\"#4e79a7\", \"#f28e2b\", \"#59a14f\", \"#e15759\"];\n\nnew Chart(document.getElementById(\"pie\"), {\n  type: \"pie\",\n  data: { labels: items, datasets: [{ data: stock, backgroundColor: colors }] },\n  options: { plugins: { title: { display: true, text: \"Stock Distribution\" } } }\n});\n\nnew Chart(document.getElementById(\"bar\"), {\n  type: \"bar\",\n  data: { labels: items, datasets: [{ label: \"Units in stock\", data: stock, backgroundColor: colors }] },\n  options: { plugins: { title: { display: true, text: \"Stock Levels by Category\" } } }\n});\n<\/script>\n<\/body>\n<\/html>\n"}, "Exp2 Memory Recall": {"index.html": "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n<title>Memory Recall Task<\/title>\n<style>\n  body { font-family: Arial; text-align: center; margin-top: 50px; }\n  #box { font-size: 34px; letter-spacing: 3px; margin: 30px; min-height: 46px; }\n  input { font-size: 22px; padding: 6px; width: 260px; text-align: center; display: none; }\n  button { font-size: 18px; padding: 8px 22px; margin-top: 12px; }\n<\/style>\n<\/head>\n<body>\n<h2>Memory Recall Task<\/h2>\n<p id=\"info\">You will see 12 digits for 5 seconds. Remember them.<\/p>\n<div id=\"box\"><\/div>\n<input id=\"ans\" placeholder=\"type the digits\">\n<br>\n<button id=\"btn\">Start<\/button>\n<p id=\"result\"><\/p>\n\n<script>\nvar step = 0, digits = \"\", scores = [];\nvar box = document.getElementById(\"box\");\nvar info = document.getElementById(\"info\");\nvar ans = document.getElementById(\"ans\");\nvar btn = document.getElementById(\"btn\");\n\nfunction randomDigits() {\n  var s = \"\";\n  for (var i = 0; i < 12; i++) s += Math.floor(Math.random() * 10);\n  return s;\n}\nfunction score(a, b) {\n  var c = 0;\n  for (var i = 0; i < 12; i++) if (a[i] === b[i]) c++;\n  return c;\n}\nfunction showTest(chunked) {\n  digits = randomDigits();\n  box.textContent = chunked ? digits.match(/.{4}/g).join(\"  \") : digits;\n  info.textContent = chunked ? \"Test 2 (grouped): remember these digits\" : \"Test 1 (not grouped): remember these digits\";\n  btn.style.display = \"none\";\n  ans.style.display = \"none\";\n  setTimeout(function () {\n    box.textContent = \"\";\n    info.textContent = \"Type the digits you remember\";\n    ans.value = \"\";\n    ans.style.display = \"inline\";\n    btn.textContent = \"Submit\";\n    btn.style.display = \"inline\";\n  }, 5000);\n}\n\nbtn.onclick = function () {\n  if (step === 0) { showTest(false); step = 1; }\n  else if (step === 1) { scores[0] = score(ans.value.replace(/\\s/g, \"\"), digits); showTest(true); step = 2; }\n  else if (step === 2) {\n    scores[1] = score(ans.value.replace(/\\s/g, \"\"), digits);\n    ans.style.display = \"none\";\n    info.textContent = \"Result\";\n    document.getElementById(\"result\").innerHTML =\n      \"Without chunking: <b>\" + scores[0] + \" / 12<\/b><br>With chunking: <b>\" + scores[1] + \" / 12<\/b><br>\" +\n      (scores[1] > scores[0] ? \"Chunking improved recall.\" : \"Try again for a clearer difference.\");\n    btn.textContent = \"Try again\";\n    step = 3;\n  } else { location.reload(); }\n};\n<\/script>\n<\/body>\n<\/html>\n"}, "Exp3 CLI-GUI-VUI": {"gui.py": "import tkinter as tk\nimport os\n\ndef rename_file():\n    try:\n        os.rename(old.get(), new.get())\n        result.config(text=\"File renamed successfully\", fg=\"green\")\n    except FileNotFoundError:\n        result.config(text=\"File not found\", fg=\"red\")\n\nroot = tk.Tk()\nroot.title(\"File Renamer (GUI)\")\ntk.Label(root, text=\"Old name\").pack()\nold = tk.Entry(root); old.pack()\ntk.Label(root, text=\"New name\").pack()\nnew = tk.Entry(root); new.pack()\ntk.Button(root, text=\"Rename\", command=rename_file).pack(pady=8)\nresult = tk.Label(root, text=\"\")\nresult.pack()\nroot.mainloop()\n", "rename.py": "import os, sys\n\nif len(sys.argv) != 3:\n    print(\"Usage: python rename.py old_name new_name\")\n    sys.exit()\n\nold_name = sys.argv[1]\nnew_name = sys.argv[2]\n\ntry:\n    os.rename(old_name, new_name)\n    print(\"Renamed\", old_name, \"to\", new_name)\nexcept FileNotFoundError:\n    print(\"Error: file not found\")\n", "vui.html": "<!DOCTYPE html>\n<html>\n<head>\n<title>Voice User Interface<\/title>\n<\/head>\n<body style=\"font-family: Arial; text-align: center;\">\n<h2>Voice User Interface<\/h2>\n<button id=\"mic\" style=\"font-size: 20px; padding: 10px 24px;\">Speak<\/button>\n<p>You said: <b id=\"said\">...<\/b><\/p>\n<p id=\"reply\"><\/p>\n\n<script>\nvar SR = window.SpeechRecognition || window.webkitSpeechRecognition;\nvar rec = new SR();\nrec.lang = \"en-US\";\n\nrec.onresult = function (e) {\n  var text = e.results[0][0].transcript.toLowerCase();\n  var reply = \"Command not recognised\";\n  if (text.includes(\"hello\")) {\n    reply = \"Hello! How can I help you?\";\n  } else if (text.includes(\"time\")) {\n    reply = \"The time is \" + new Date().toLocaleTimeString();\n  } else if (text.includes(\"color\")) {\n    document.body.style.background = \"lightblue\";\n    reply = \"Background changed to blue\";\n  }\n  document.getElementById(\"said\").textContent = text;\n  document.getElementById(\"reply\").textContent = reply;\n  speechSynthesis.speak(new SpeechSynthesisUtterance(reply));\n};\n\ndocument.getElementById(\"mic\").onclick = function () { rec.start(); };\n<\/script>\n<\/body>\n<\/html>\n"}, "Exp4 Navigation Prototype": {"index.html": "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n<title>Navigation Prototype<\/title>\n<style>\n  body { font-family: Arial; background: #e9eef5; display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; padding: 20px; }\n  .phone { width: 280px; height: 480px; background: #fff; border: 3px solid #333; border-radius: 22px; overflow: hidden; position: relative; }\n  .header { background: #1a73e8; color: #fff; padding: 12px; display: flex; gap: 10px; align-items: center; }\n  .header button { background: none; border: 0; color: #fff; font-size: 20px; cursor: pointer; }\n  .screen { display: none; padding: 16px; }\n  .screen.on { display: block; }\n  .btn { display: block; width: 100%; padding: 12px; margin-bottom: 10px; background: #e8f0fe; border: 1px solid #1a73e8; border-radius: 6px; cursor: pointer; }\n  #menu { display: none; background: #f1f3f4; padding: 8px; }\n  #menu div { padding: 8px; cursor: pointer; }\n  #dot { position: absolute; right: 12px; bottom: 12px; width: 14px; height: 14px; border-radius: 50%; background: #bbb; cursor: pointer; }\n  #bar { position: absolute; bottom: 0; left: 0; right: 0; height: 26px; text-align: center; font-size: 11px; color: #888; }\n  .side { width: 250px; }\n<\/style>\n<\/head>\n<body>\n<div class=\"phone\">\n  <div class=\"header\"><button id=\"back\">&larr;<\/button><span id=\"title\">Home<\/span><button id=\"burger\" style=\"margin-left:auto\">&#9776;<\/button><\/div>\n  <div id=\"menu\"><div data-go=\"home\">Home<\/div><div data-go=\"profile\">Profile<\/div><\/div>\n\n  <div class=\"screen on\" id=\"home\">\n    <h3>Home<\/h3>\n    <p>Familiar navigation: header, back arrow, menu and buttons.<\/p>\n    <button class=\"btn\" data-go=\"profile\">Go to Profile<\/button>\n    <p style=\"font-size:13px\">Unfamiliar navigation: drag the screen upwards, or double-click the small grey dot.<\/p>\n  <\/div>\n  <div class=\"screen\" id=\"profile\"><h3>Profile<\/h3><p>This is the profile screen.<\/p><\/div>\n  <div class=\"screen\" id=\"details\"><h3>Hidden Details<\/h3><p>You found the unfamiliar navigation.<\/p><\/div>\n\n  <div id=\"dot\" title=\"?\"><\/div>\n  <div id=\"bar\">swipe up<\/div>\n<\/div>\n\n<div class=\"side\">\n  <h3>Feedback<\/h3>\n  <p>Which navigation was easier for you?<\/p>\n  <button class=\"btn\" data-vote=\"familiar\">Familiar (buttons and menu)<\/button>\n  <button class=\"btn\" data-vote=\"unfamiliar\">Unfamiliar (swipe / dot)<\/button>\n  <p id=\"tally\">Familiar: 0 &nbsp; Unfamiliar: 0<\/p>\n<\/div>\n\n<script>\nvar votes = { familiar: 0, unfamiliar: 0 };\nfunction go(id) {\n  document.querySelectorAll(\".screen\").forEach(function (s) { s.classList.remove(\"on\"); });\n  document.getElementById(id).classList.add(\"on\");\n  document.getElementById(\"title\").textContent = id.charAt(0).toUpperCase() + id.slice(1);\n  document.getElementById(\"menu\").style.display = \"none\";\n}\ndocument.querySelectorAll(\"[data-go]\").forEach(function (e) { e.onclick = function () { go(e.dataset.go); }; });\ndocument.getElementById(\"back\").onclick = function () { go(\"home\"); };\ndocument.getElementById(\"burger\").onclick = function () {\n  var m = document.getElementById(\"menu\"); m.style.display = m.style.display === \"block\" ? \"none\" : \"block\";\n};\ndocument.getElementById(\"dot\").ondblclick = function () { go(\"details\"); };\n\nvar startY = null;\nvar phone = document.querySelector(\".phone\");\nphone.onmousedown = function (e) { startY = e.clientY; };\nphone.onmouseup = function (e) { if (startY !== null && startY - e.clientY > 80) go(\"details\"); startY = null; };\nphone.ontouchstart = function (e) { startY = e.touches[0].clientY; };\nphone.ontouchend = function (e) { if (startY !== null && startY - e.changedTouches[0].clientY > 80) go(\"details\"); startY = null; };\n\ndocument.querySelectorAll(\"[data-vote]\").forEach(function (b) {\n  b.onclick = function () {\n    votes[b.dataset.vote]++;\n    document.getElementById(\"tally\").innerHTML = \"Familiar: \" + votes.familiar + \" &nbsp; Unfamiliar: \" + votes.unfamiliar;\n  };\n});\n<\/script>\n<\/body>\n<\/html>\n"}, "Exp5 Task Analysis Flow": {"index.html": "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n<title>Task Analysis and Wireframes<\/title>\n<style>\n  body { font-family: Arial; background: #f4f6fa; text-align: center; padding: 20px; }\n  .flow { display: inline-flex; flex-direction: column; align-items: center; }\n  .oval { background: #cfe8cf; border: 2px solid #3a7d3a; border-radius: 30px; padding: 8px 30px; }\n  .proc { background: #dbe7fb; border: 2px solid #3a5fa8; padding: 8px 24px; }\n  .dec  { background: #fdebc8; border: 2px solid #b27a12; padding: 16px 20px; transform: skewX(-10deg); }\n  .arrow { font-size: 22px; line-height: 26px; }\n  .note { font-size: 13px; color: #a33; }\n  .wire { display: inline-block; width: 150px; height: 260px; border: 2px solid #555; margin: 10px; vertical-align: top; background: #fff; text-align: left; padding: 8px; box-sizing: border-box; }\n  .wire div { background: #ddd; margin-bottom: 8px; height: 26px; font-size: 12px; padding: 5px; box-sizing: border-box; }\n  .wire .tall { height: 60px; }\n  .wire .btn { background: #888; color: #fff; text-align: center; }\n<\/style>\n<\/head>\n<body>\n<h1>Online Shopping - Task Analysis<\/h1>\n<h3>User flow (flowchart)<\/h3>\n<div class=\"flow\">\n  <div class=\"oval\">Start<\/div><div class=\"arrow\">&darr;<\/div>\n  <div class=\"proc\">Open the app<\/div><div class=\"arrow\">&darr;<\/div>\n  <div class=\"proc\">Browse / Search products<\/div><div class=\"arrow\">&darr;<\/div>\n  <div class=\"proc\">Select a product<\/div><div class=\"arrow\">&darr;<\/div>\n  <div class=\"dec\">Item available?<\/div>\n  <div class=\"note\">No: go back to browse<\/div><div class=\"arrow\">&darr; Yes<\/div>\n  <div class=\"proc\">Add to cart<\/div><div class=\"arrow\">&darr;<\/div>\n  <div class=\"proc\">Checkout<\/div><div class=\"arrow\">&darr;<\/div>\n  <div class=\"dec\">Payment successful?<\/div>\n  <div class=\"note\">No: try payment again<\/div><div class=\"arrow\">&darr; Yes<\/div>\n  <div class=\"proc\">Order tracking<\/div><div class=\"arrow\">&darr;<\/div>\n  <div class=\"oval\">End<\/div>\n<\/div>\n\n<h3>Wireframes<\/h3>\n<div class=\"wire\"><b>Home<\/b><div>Search bar<\/div><div class=\"tall\">Product<\/div><div class=\"tall\">Product<\/div><\/div>\n<div class=\"wire\"><b>Cart<\/b><div>Item 1<\/div><div>Item 2<\/div><div>Total<\/div><div class=\"btn\">Checkout<\/div><\/div>\n<div class=\"wire\"><b>Checkout<\/b><div>Address<\/div><div>Payment<\/div><div>Order summary<\/div><div class=\"btn\">Pay<\/div><\/div>\n<\/body>\n<\/html>\n"}, "Exp6 Shopping App RAD": {"index.html": "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n<title>Shopping App<\/title>\n<style>\n  body { font-family: Arial; background: #eef1f6; display: flex; justify-content: center; padding: 20px; }\n  .app { width: 340px; background: #fff; border: 3px solid #333; border-radius: 20px; overflow: hidden; min-height: 480px; }\n  .head { background: #6a1b9a; color: #fff; padding: 12px; font-weight: bold; display: flex; justify-content: space-between; }\n  .page { display: none; padding: 16px; }\n  .page.on { display: block; }\n  .item { border: 1px solid #bbb; border-radius: 8px; padding: 10px; margin-bottom: 10px; cursor: pointer; }\n  button { padding: 10px 16px; background: #6a1b9a; color: #fff; border: 0; border-radius: 6px; cursor: pointer; margin: 4px 0; }\n  .nav { display: flex; justify-content: space-around; background: #f1e4f7; padding: 8px; font-size: 14px; }\n  .nav span { cursor: pointer; color: #6a1b9a; }\n<\/style>\n<\/head>\n<body>\n<div class=\"app\">\n  <div class=\"head\"><span>Shopping App<\/span><span>Cart: <b id=\"count\">0<\/b><\/span><\/div>\n\n  <div class=\"page on\" id=\"home\">\n    <h3>Home<\/h3>\n    <input placeholder=\"Search products\" style=\"width:100%;padding:8px;margin-bottom:10px;box-sizing:border-box\">\n    <div class=\"item\" onclick=\"openProduct('Headphones', 1500)\">Headphones - Rs 1500<\/div>\n    <div class=\"item\" onclick=\"openProduct('Backpack', 900)\">Backpack - Rs 900<\/div>\n  <\/div>\n\n  <div class=\"page\" id=\"product\">\n    <h3 id=\"pname\"><\/h3>\n    <p id=\"pprice\"><\/p>\n    <button onclick=\"addToCart()\">Add to Cart<\/button>\n  <\/div>\n\n  <div class=\"page\" id=\"checkout\">\n    <h3>Checkout<\/h3>\n    <p id=\"cartlist\">Cart is empty<\/p>\n    <p>Total: Rs <b id=\"total\">0<\/b><\/p>\n    <button onclick=\"pay()\">Pay<\/button>\n  <\/div>\n\n  <div class=\"page\" id=\"orders\">\n    <h3>Order History<\/h3>\n    <div id=\"orderlist\">No orders yet<\/div>\n  <\/div>\n\n  <div class=\"nav\"><span onclick=\"show('home')\">Home<\/span><span onclick=\"show('checkout')\">Checkout<\/span><span onclick=\"show('orders')\">Orders<\/span><\/div>\n<\/div>\n\n<script>\nvar cart = [], orders = [], current = null;\nfunction show(id) {\n  document.querySelectorAll(\".page\").forEach(function (p) { p.classList.remove(\"on\"); });\n  document.getElementById(id).classList.add(\"on\");\n  if (id === \"checkout\") {\n    var t = 0;\n    cart.forEach(function (c) { t += c.price; });\n    document.getElementById(\"cartlist\").innerHTML = cart.length ? cart.map(function (c) { return c.name + \" - Rs \" + c.price; }).join(\"<br>\") : \"Cart is empty\";\n    document.getElementById(\"total\").textContent = t;\n  }\n  if (id === \"orders\") {\n    document.getElementById(\"orderlist\").innerHTML = orders.length ? orders.join(\"<br>\") : \"No orders yet\";\n  }\n}\nfunction openProduct(name, price) {\n  current = { name: name, price: price };\n  document.getElementById(\"pname\").textContent = name;\n  document.getElementById(\"pprice\").textContent = \"Price: Rs \" + price;\n  show(\"product\");\n}\nfunction addToCart() {\n  cart.push(current);\n  document.getElementById(\"count\").textContent = cart.length;\n  show(\"checkout\");\n}\nfunction pay() {\n  if (!cart.length) return;\n  orders.push(\"Order \" + (orders.length + 1) + \": \" + cart.map(function (c) { return c.name; }).join(\", \"));\n  cart = [];\n  document.getElementById(\"count\").textContent = 0;\n  show(\"orders\");\n}\n<\/script>\n<\/body>\n<\/html>\n"}, "Exp7 Layout Colour Schemes": {"index.html": "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n<title>Layouts and Colour Schemes<\/title>\n<style>\n  body { font-family: Arial; background: #ddd; text-align: center; }\n  .row { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }\n  .phone { width: 240px; height: 427px; border: 3px solid #333; border-radius: 18px; overflow: hidden; text-align: left; }\n  .head { padding: 14px; font-weight: bold; }\n  .card { margin: 12px; padding: 14px; border-radius: 8px; }\n  .btn { margin: 12px; padding: 12px; text-align: center; border-radius: 8px; font-weight: bold; }\n\n  .a { background: #e3f2fd; }\n  .a .head { background: #1565c0; color: #fff; }\n  .a .card { background: #fff; color: #0d47a1; }\n  .a .btn { background: #1565c0; color: #fff; }\n\n  .b { background: #fff3e0; }\n  .b .head { background: #e65100; color: #fff; }\n  .b .card { background: #fff; color: #bf360c; }\n  .b .btn { background: #e65100; color: #fff; }\n<\/style>\n<\/head>\n<body>\n<h1>Two Colour Schemes (360 x 640 layout)<\/h1>\n<div class=\"row\">\n  <div>\n    <h3>Scheme A: Blue<\/h3>\n    <div class=\"phone a\"><div class=\"head\">My App<\/div><div class=\"card\">Card one<\/div><div class=\"card\">Card two<\/div><div class=\"btn\">Continue<\/div><\/div>\n  <\/div>\n  <div>\n    <h3>Scheme B: Orange<\/h3>\n    <div class=\"phone b\"><div class=\"head\">My App<\/div><div class=\"card\">Card one<\/div><div class=\"card\">Card two<\/div><div class=\"btn\">Continue<\/div><\/div>\n  <\/div>\n<\/div>\n\n<h3>Feedback: which looks better?<\/h3>\n<button onclick=\"vote('A')\">Scheme A<\/button>\n<button onclick=\"vote('B')\">Scheme B<\/button>\n<p id=\"tally\">A: 0 &nbsp; B: 0<\/p>\n\n<script>\nvar v = { A: 0, B: 0 };\nfunction vote(x) {\n  v[x]++;\n  document.getElementById(\"tally\").innerHTML = \"A: \" + v.A + \" &nbsp; B: \" + v.B;\n}\n<\/script>\n<\/body>\n<\/html>\n"}, "Exp8 Storyboard": {"index.html": "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n<title>Storyboard<\/title>\n<style>\n  body { font-family: Arial; background: #f5f5f5; text-align: center; padding: 20px; }\n  .board { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px; }\n  .screen { width: 150px; height: 260px; border: 2px solid #444; border-radius: 12px; background: #fff; padding: 8px; text-align: left; box-sizing: border-box; transition: 0.3s; }\n  .screen.on { border-color: #e91e63; box-shadow: 0 0 12px #e91e63; transform: scale(1.06); }\n  .screen div { background: #e3e3e3; margin-bottom: 6px; height: 24px; font-size: 11px; padding: 4px; box-sizing: border-box; }\n  .screen .big { height: 70px; }\n  .screen .btn { background: #555; color: #fff; text-align: center; }\n  .arrow { font-size: 28px; }\n  .cap { font-size: 12px; margin-top: 4px; }\n<\/style>\n<\/head>\n<body>\n<h1>E-commerce App Storyboard<\/h1>\n<button onclick=\"play()\">Play user flow<\/button>\n<p><\/p>\n<div class=\"board\">\n  <div><div class=\"screen\"><b>Home<\/b><div>Search bar<\/div><div class=\"big\">Product<\/div><div class=\"big\">Product<\/div><\/div><div class=\"cap\">1. Home<\/div><\/div>\n  <span class=\"arrow\">&rarr;<\/span>\n  <div><div class=\"screen\"><b>Products<\/b><div>Category<\/div><div>Item 1<\/div><div>Item 2<\/div><div>Item 3<\/div><\/div><div class=\"cap\">2. Product list<\/div><\/div>\n  <span class=\"arrow\">&rarr;<\/span>\n  <div><div class=\"screen\"><b>Details<\/b><div class=\"big\">Image<\/div><div>Price<\/div><div class=\"btn\">Add to Cart<\/div><\/div><div class=\"cap\">3. Product details<\/div><\/div>\n  <span class=\"arrow\">&rarr;<\/span>\n  <div><div class=\"screen\"><b>Checkout<\/b><div>Item list<\/div><div>Total<\/div><div class=\"btn\">Pay<\/div><\/div><div class=\"cap\">4. Checkout<\/div><\/div>\n  <span class=\"arrow\">&rarr;<\/span>\n  <div><div class=\"screen\"><b>Confirmation<\/b><div class=\"big\">Tick<\/div><div>Order placed<\/div><\/div><div class=\"cap\">5. Payment confirmation<\/div><\/div>\n<\/div>\n\n<script>\nfunction play() {\n  var s = document.querySelectorAll(\".screen\");\n  s.forEach(function (x, i) {\n    setTimeout(function () {\n      s.forEach(function (y) { y.classList.remove(\"on\"); });\n      x.classList.add(\"on\");\n    }, i * 1000);\n  });\n}\n<\/script>\n<\/body>\n<\/html>\n"}, "Exp9 Form Validation": {"index.html": "<!DOCTYPE html>\n<html>\n<head>\n<title>Form Validation<\/title>\n<style>\n  body { font-family: Arial; background: #f2f2f2; display: flex; justify-content: center; padding-top: 40px; }\n  form { background: #fff; padding: 20px; width: 300px; border-radius: 8px; }\n  input { width: 100%; padding: 8px; margin: 6px 0; box-sizing: border-box; }\n  .error { color: red; font-size: 13px; }\n  button { padding: 8px 18px; }\n<\/style>\n<\/head>\n<body>\n<form id=\"form\">\n  <h3>Registration Form<\/h3>\n  <label>Email<\/label>\n  <input type=\"text\" id=\"email\">\n  <span class=\"error\" id=\"emailError\"><\/span><br>\n  <label>Phone Number<\/label>\n  <input type=\"text\" id=\"phone\">\n  <span class=\"error\" id=\"phoneError\"><\/span><br><br>\n  <button type=\"submit\">Submit<\/button>\n  <p id=\"msg\" style=\"color:green\"><\/p>\n<\/form>\n\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/validator/13.6.0/validator.min.js\"><\/script>\n<script>\ndocument.getElementById(\"form\").addEventListener(\"submit\", function (e) {\n  e.preventDefault();\n  var email = document.getElementById(\"email\").value;\n  var phone = document.getElementById(\"phone\").value;\n  var ok = true;\n\n  if (validator.isEmail(email)) {\n    document.getElementById(\"emailError\").textContent = \"\";\n  } else {\n    document.getElementById(\"emailError\").textContent = \"Enter a valid email\";\n    ok = false;\n  }\n\n  if (validator.isMobilePhone(phone, \"en-IN\")) {\n    document.getElementById(\"phoneError\").textContent = \"\";\n  } else {\n    document.getElementById(\"phoneError\").textContent = \"Enter a valid 10-digit phone number\";\n    ok = false;\n  }\n\n  document.getElementById(\"msg\").textContent = ok ? \"Form submitted successfully\" : \"\";\n});\n<\/script>\n<\/body>\n<\/html>\n"}};
+
+/* block helpers: a string starting with "+ " marks text added to your observation */
+function H(t, add) { return { k: "h", t: t, add: add }; }
+function P(t) { return { k: "p", t: t }; }
+function UL(a) { return { k: "ul", a: a }; }
+function OL(a) { return { k: "ol", a: a }; }
+function C(name, code) { return { k: "c", name: name, code: code }; }
+
+/* short code for the written record */
+var W9 = `<style>
+  input { padding: 5px; margin: 5px; }
+</style>
+
+<form id="f">
+  Email: <input id="email"><br>
+  Phone: <input id="phone"><br>
+  <button>Submit</button>
+</form>
+<p id="msg"></p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/validator/13.6.0/validator.min.js"><\/script>
+<script>
+document.getElementById("f").onsubmit = function (e) {
+  e.preventDefault();
+  var email = document.getElementById("email").value;
+  var phone = document.getElementById("phone").value;
+  var msg = "";
+  if (!validator.isEmail(email)) msg += "Invalid email. ";
+  if (!validator.isMobilePhone(phone, "en-IN")) msg += "Invalid phone. ";
+  document.getElementById("msg").innerHTML = msg || "Form submitted";
+};
+<\/script>`;
+
+var W10 = `<canvas id="pie"></canvas>
+<canvas id="bar"></canvas>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>
+<script>
+var items = ["Laptop", "Phone", "Tablet"];
+var stock = [40, 65, 25];
+var colors = ["red", "blue", "green"];
+
+new Chart(document.getElementById("pie"), {
+  type: "pie",
+  data: { labels: items, datasets: [{ data: stock, backgroundColor: colors }] }
+});
+
+new Chart(document.getElementById("bar"), {
+  type: "bar",
+  data: { labels: items, datasets: [{ label: "Stock", data: stock, backgroundColor: colors }] }
+});
+<\/script>`;
+
+/* ---------------- the ten experiments ---------------- */
+var E = [
+{
+  n: 1, date: "26.01.26", folder: "Exp1 Good-Bad UI", title: "Good UI and Bad UI Design",
+  aim: "To design and compare a good user interface and a bad user interface using Figma and understand the importance of UI design principles.",
+  body: [
+    H("Theory"),
+    P("User Interface design focuses on creating visually appealing, simple and user-friendly interfaces. A good UI follows design principles such as alignment, contrast, spacing, consistency and readability. These principles help users understand and navigate the interface easily."),
+    P("By comparing good and bad designs, we can clearly understand how proper structure and visual hierarchy improve user experience."),
+    H("Bad UI", true),
+    UL(["+ Items are placed randomly with no alignment.", "+ Poor colour contrast, such as red text on a green background.", "+ Elements are crowded with no spacing.", "+ Many different fonts and colours.", "+ Tiny, unclear text."]),
+    H("Good UI", true),
+    UL(["+ Items are aligned neatly.", "+ Dark text on a light background gives good contrast.", "+ Equal spacing between elements.", "+ One font and one colour theme.", "+ Clear and readable text."]),
+    H("Procedure (Figma)", true),
+    OL(["+ Open Figma and create a new design file.", "+ Make one mobile frame and design a bad UI.", "+ Make a second frame with the same content as a good UI.", "+ Compare both designs and write the reasons."])
+  ],
+  result: "The experiment showed that following UI design principles significantly improves user experience.",
+  x: {
+    tool: "Figma", where: "figma.com in Chrome (free login)",
+    demo: ["Open the folder below and double-click <code class='k'>index.html</code>. It opens in Chrome.", "Compare the Bad UI phone and the Good UI phone, and read the reasons under each."],
+    steps: [
+      "Click <b>New design file</b>.",
+      "Press <code class='k'>F</code> (Frame tool), pick <b>Phone &rarr; iPhone 14</b>, rename the frame <b>Bad UI</b>.",
+      "Build the <b>bad</b> login screen: 3 different fonts, red text on a green background, two buttons of different sizes that touch each other, tiny grey labels, nothing aligned.",
+      "Select the frame, press <code class='k'>Ctrl + D</code> to duplicate, rename it <b>Good UI</b>.",
+      "Fix it: one font (Inter), dark text on a light background, use the <b>Align</b> buttons on the right panel, <code class='k'>Shift + A</code> (Auto layout) for equal spacing, one clear blue Login button.",
+      "Put the two frames side by side, press <code class='k'>Shift + 1</code> to fit the screen, then take a screenshot."
+    ],
+    out: "Both frames side by side with the reasons written below each one."
+  },
+  v: [
+    ["What is a user interface?", "The part of an app or website the user sees and uses: buttons, text, colours and layout."],
+    ["Name the main UI design principles.", "Alignment, contrast, spacing, consistency and readability."],
+    ["What is visual hierarchy?", "Arranging elements so the most important thing is noticed first, using size, colour and position."],
+    ["Why is contrast important?", "It makes text easy to read against the background. Poor contrast strains the eyes."],
+    ["What makes a UI bad?", "Clutter, mixed fonts, poor colours, no alignment and confusing navigation."],
+    ["What is Figma?", "A browser-based tool for designing and prototyping interfaces. Many people can work on one file together."],
+    ["Difference between UI and UX?", "UI is how the product looks. UX is the full experience of using it."]
+  ]
+},
+{
+  n: 2, date: "28.01.26", folder: "Exp2 Memory Recall", title: "Memory Recall Task using Chunking",
+  aim: "To design a user interface that tests memory recall and to evaluate the effect of chunking.",
+  body: [
+    H("Theory"),
+    UL(["Memory recall is the ability to remember previously seen information.", "The human brain can remember only a limited number of items at a time.", "Chunking is a technique where information is grouped into smaller meaningful units.", "Grouping reduces cognitive load and makes information easier to process.", "In UI design, chunking improves clarity and enhances user experience."]),
+    H("Procedure (Figma)", true),
+    OL(["+ Design a home screen with the instruction page.", "+ Show items without grouping for a few seconds and ask the user to recall them.", "+ Show items grouped into chunks and ask the user to recall again.", "+ Compare the recall results of both tasks."])
+  ],
+  result: "The experiment shows that chunking improves short term memory and enhances recall performance.",
+  x: {
+    tool: "Figma (Prototype mode)", where: "figma.com in Chrome",
+    demo: ["Open the folder below and double-click <code class='k'>index.html</code>.", "Click <b>Start</b>. Remember the 12 digits shown for 5 seconds, type them and click Submit.", "Do the second test (digits in groups of 4). The result page shows both scores."],
+    steps: [
+      "New design file. Make 5 phone frames in a row: <b>Home</b>, <b>Test 1</b>, <b>Recall 1</b>, <b>Test 2</b>, <b>Recall 2</b>.",
+      "<b>Home</b>: heading <i>Memory Recall Task</i>, the instruction text and a <b>Start</b> button.",
+      "<b>Test 1</b> (no chunking): one long line of digits such as <code class='k'>7 3 9 4 1 8 2 6 5 0 3 7</code>.",
+      "<b>Recall 1</b>: text <i>Type what you remember</i>, an input box and a Submit button.",
+      "<b>Test 2</b> (chunked): <code class='k'>7394 1826 5037</code>. <b>Recall 2</b> is the same as Recall 1.",
+      "Open the <b>Prototype</b> tab. Drag from Start to Test 1 (<b>On click</b>). Drag from Test 1 to Recall 1 with <b>After delay = 5000 ms</b>. Same for Test 2.",
+      "Press <b>Play</b> (top right) and try it with a friend. Note the digits recalled in each round."
+    ],
+    out: "The prototype running screen by screen, and the result showing chunked digits recalled better."
+  },
+  v: [
+    ["What is chunking?", "Grouping information into small meaningful units, like writing a phone number as 98765 43210."],
+    ["What does memory recall mean?", "Remembering information that was seen earlier."],
+    ["What is cognitive load?", "The mental effort needed to process information. Chunking lowers it."],
+    ["How many items can short term memory hold?", "About 7 plus or minus 2 items (Miller's law)."],
+    ["Where is chunking used in a UI?", "Phone and card number fields, grouped menus, forms split into sections, dashboard cards."],
+    ["How did you show the numbers for only a few seconds?", "With the Figma prototype interaction After delay, which moves to the next screen automatically."],
+    ["What was your result?", "Chunked items were recalled better than unchunked items."]
+  ]
+},
+{
+  n: 3, date: "04.02.26", folder: "Exp3 CLI-GUI-VUI", title: "Difference between CLI, GUI and VUI",
+  aim: "To study and compare Command Line Interface, Graphical User Interface and Voice User Interface.",
+  body: [
+    H("Command Line Interface (CLI)"),
+    P("A text based interface where users interact by typing commands. It is fast, powerful and supports automation with low resource usage."),
+    UL(["+ Input: typed commands.", "+ Example: Command Prompt."]),
+    H("Graphical User Interface (GUI)"),
+    P("Uses visual elements like icons, buttons and windows for interaction. It is easy to use but requires more system resources."),
+    UL(["+ Input: mouse, touch or keyboard.", "+ Example: Windows, Android."]),
+    H("Voice User Interface (VUI)"),
+    P("Allows the user to interact with a system using voice commands. It provides hands-free and natural communication but may face problems with noise and accents."),
+    UL(["+ Input: voice.", "+ Example: Alexa, Siri, Google Assistant."])
+  ],
+  result: "CLI is efficient, GUI is user friendly and VUI enables voice based interaction.",
+  x: {
+    tool: "Python 3 and Chrome", where: "Needs Python installed (python.org)",
+    steps: [
+      "Open the folder below, click the address bar, type <code class='k'>cmd</code> and press Enter. A terminal opens inside the folder.",
+      "<b>CLI:</b> run the Terminal commands shown below. The terminal prints the result.",
+      "<b>GUI:</b> run <code class='k'>python gui.py</code>. In the window type <code class='k'>b.txt</code> as old name and <code class='k'>c.txt</code> as new name, then click Rename.",
+      "<b>VUI:</b> double-click <code class='k'>vui.html</code> (opens in Chrome). Click <b>Speak</b>, allow the microphone and say <i>hello</i>, <i>what is the time</i> or <i>change color</i>."
+    ],
+    extra: [["Terminal commands (CLI)", "echo hello > a.txt\npython rename.py a.txt b.txt\npython rename.py x.txt y.txt"]],
+    out: "Screenshot 1: terminal showing <i>Renamed a.txt to b.txt</i> and the file not found error. Screenshot 2: GUI window showing <i>File renamed successfully</i>. Screenshot 3: voice page showing what you said and the reply."
+  },
+  v: [
+    ["Expand CLI, GUI and VUI.", "Command Line Interface, Graphical User Interface, Voice User Interface."],
+    ["Which interface uses the least resources?", "CLI."],
+    ["Give one example of each.", "CLI: Command Prompt. GUI: Windows or Android. VUI: Alexa, Siri, Google Assistant."],
+    ["Why do developers like the CLI?", "It is fast and commands can be put into scripts for automation."],
+    ["Which is easiest for a beginner?", "GUI."],
+    ["Advantage of VUI?", "Hands-free, natural, and helpful for people who cannot use a screen."],
+    ["Disadvantage of VUI?", "Noise and accents cause errors, and there are privacy concerns."]
+  ]
+},
+{
+  n: 4, date: "11.02.26", folder: "Exp4 Navigation Prototype", title: "Create a Prototype using Familiar and Unfamiliar Navigation Elements",
+  aim: "To create a prototype with both familiar and unfamiliar navigation elements and evaluate its usability among different user groups using Proto.io.",
+  body: [
+    H("Procedure"),
+    UL(["Create a new mobile project.", "Design a home screen with familiar navigation elements such as header and buttons.", "Add another screen.", "Implement an unfamiliar navigation element. + (for example a swipe gesture or a hidden icon)", "Link the screens using interaction.", "Share the prototype link with different user groups.", "Assign tasks such as navigating between screens.", "Collect feedback from users."])
+  ],
+  result: "Familiar navigation was easier for most users; unfamiliar navigation suited only experienced users.",
+  x: {
+    tool: "Proto.io", where: "proto.io in Chrome (free trial login)",
+    demo: ["Open the folder below and double-click <code class='k'>index.html</code>.", "Familiar navigation: click <b>Go to Profile</b>, the menu icon and the back arrow.", "Unfamiliar navigation: drag the phone screen upwards, or double-click the small grey dot.", "Click a feedback button on the right to record which one felt easier."],
+    steps: [
+      "Log in and click <b>Create new project</b>, choose <b>Mobile</b> (iPhone).",
+      "<b>Screen 1 (Home):</b> add a header bar with the title, a menu icon, and two buttons <i>Profile</i> and <i>Settings</i>. These are the <b>familiar</b> elements.",
+      "Add <b>Screen 2</b> with the plus icon in the screens panel. Put a heading and a back button on it.",
+      "On Screen 1 add the <b>unfamiliar</b> element: a small unlabeled icon, or a swipe-up gesture to reach Screen 2.",
+      "Link screens: click a button, open <b>Interactions</b>, <b>Add interaction &rarr; Tap &rarr; Transition to screen</b>, pick Screen 2 and a slide effect.",
+      "Press <b>Preview</b> and test every link.",
+      "Click <b>Share</b>, copy the prototype link and send it to two groups (for example students and elders). Give each a task such as <i>Go to Profile and come back</i>.",
+      "Note the feedback."
+    ],
+    out: "Screenshots of both screens and the running preview, plus the feedback: familiar navigation easy for all, unfamiliar only for experienced users."
+  },
+  v: [
+    ["Give examples of familiar navigation.", "Top menu bar, back button, hamburger menu, bottom tabs."],
+    ["Give examples of unfamiliar navigation.", "A swipe gesture or an unlabeled hidden icon."],
+    ["What is a prototype?", "An interactive model of the app made before development, to test the idea."],
+    ["What is Proto.io?", "A web tool to build interactive mobile prototypes without coding."],
+    ["Why test with different user groups?", "Usability differs with experience, so one group is not enough."],
+    ["What is usability?", "How easily, quickly and pleasantly users can reach their goal."],
+    ["What was your result?", "Familiar navigation was easier for most users; unfamiliar suited only experienced users."]
+  ]
+},
+{
+  n: 5, date: "17.02.26", folder: "Exp5 Task Analysis Flow", title: "Conduct Task Analysis and Wireframe using Lucidchart",
+  aim: "To perform task analysis for an online shopping app and document user flows using Lucidchart.",
+  body: [
+    H("Procedure"),
+    UL(["Identify main tasks such as browsing, searching, adding to cart, checkout and order tracking.", "Break each task into step by step user actions.", "Represent the steps using flow sequences.", "Open Lucidchart and create a new document.", "Use shapes.", "Connect steps with arrows to show user flow.", "Save and export the diagram."])
+  ],
+  result: "The user flow for major tasks in an online shopping application was successfully analysed and represented using Lucidchart.",
+  x: {
+    tool: "Lucidchart", where: "lucid.app in Chrome (free login)",
+    demo: ["Open the folder below and double-click <code class='k'>index.html</code>.", "Scroll to see the shopping flowchart and the three wireframes (Home, Cart, Checkout)."],
+    steps: [
+      "Log in, click <b>+ Document</b> and choose <b>Blank diagram</b> (or Flowchart).",
+      "Write the main tasks first: Browse, Search, Add to cart, Checkout, Track order.",
+      "From the left shape library drag: <b>Terminator</b> (oval) for Start and End, <b>Process</b> (rectangle) for each action, <b>Decision</b> (diamond) for <i>Item available?</i> and <i>Payment successful?</i>.",
+      "Build the flow: <b>Start &rarr; Open app &rarr; Browse / Search &rarr; Select product &rarr; Add to cart &rarr; Checkout &rarr; Payment &rarr; Order tracking &rarr; End</b>.",
+      "Join shapes by dragging from a shape's edge point to the next shape. Label the Yes / No arrows.",
+      "For the wireframe open <b>Shape Library &rarr; UI mockups / Wireframe</b> and draw 3 screens: Home, Cart, Checkout.",
+      "<b>File &rarr; Download &rarr; PDF or PNG</b>."
+    ],
+    out: "The flowchart from Start to End with arrows, and the three wireframe screens."
+  },
+  v: [
+    ["What is task analysis?", "Breaking a task into small steps to understand how a user completes a goal."],
+    ["What is a user flow?", "The path a user follows through the app to finish a task."],
+    ["What is a wireframe?", "A simple layout sketch of a screen that shows structure without final design."],
+    ["What is Lucidchart?", "An online tool for making flowcharts and diagrams."],
+    ["Which flowchart shapes did you use?", "Oval for start and end, rectangle for a process, diamond for a decision, arrows for flow."],
+    ["Why do task analysis before wireframes?", "Knowing the steps tells you which screens and buttons are needed."],
+    ["Main tasks in a shopping app?", "Browsing, searching, adding to cart, checkout and order tracking."]
+  ]
+},
+{
+  n: 6, date: "24.02.26", folder: "Exp6 Shopping App RAD", title: "Develop UI using Axure RP",
+  aim: "To demonstrate the lifecycle stages of UI design via the RAD model and develop a small interactive interface employing Axure RP.",
+  body: [
+    H("Requirement Planning"),
+    UL(["Goal: define features and identify stakeholders need.", "Key features: home, product, checkout and order history.", "User actions: browsing, loading and cart."]),
+    H("User Design"),
+    UL(["Shop: launch Axure RP and create a new project named Shopping App.", "Design a high fidelity UI."]),
+    H("Implementation"),
+    UL(["Create dynamic pages and link them using interactions (flow).", "Click Preview to view the flow.", "Adjust the design based on user feedback."]),
+    H("Testing"),
+    UL(["Complete all transactions.", "Inspect reports as an HTML file."])
+  ],
+  result: "Thus the lifecycle stages of UI design via the RAD model were demonstrated and a shopping app interface was developed using Axure RP.",
+  x: {
+    tool: "Axure RP", where: "axure.com, download and install the free trial",
+    demo: ["Open the folder below and double-click <code class='k'>index.html</code>.", "Click a product, click <b>Add to Cart</b>, click <b>Pay</b>, then open <b>Orders</b>. This is the Home, Product, Checkout and Order History flow."],
+    steps: [
+      "Open Axure RP, <b>File &rarr; New</b>, save it as <b>Shopping App</b>.",
+      "In the <b>Pages</b> panel add 4 pages: <b>Home, Product, Checkout, Order History</b>.",
+      "<b>Home:</b> drag a Rectangle for the header, a Text Field for search, and 3 Rectangles as product boxes. Fill colours and add text.",
+      "<b>Product:</b> Image placeholder, price text and a button <b>Add to Cart</b>. <b>Checkout:</b> order list text and a <b>Pay</b> button. <b>Order History:</b> a simple list.",
+      "Add interactions: select a product box, in the right panel click <b>New Interaction &rarr; Click &rarr; Open Link &rarr; Product</b>. Same for Add to Cart &rarr; Checkout and Pay &rarr; Order History.",
+      "Click <b>Preview</b> (top toolbar). The prototype opens in the browser; click through all pages.",
+      "<b>Publish &rarr; Generate Prototype Files</b> to create the HTML files, then open the folder and inspect them."
+    ],
+    out: "Screenshots of the four pages, the browser preview and the generated HTML files. Mention the RAD stages: Requirement planning, User design, Implementation, Testing."
+  },
+  v: [
+    ["What is RAD?", "Rapid Application Development: building quickly through prototypes and feedback instead of long planning."],
+    ["Stages of RAD?", "Requirements planning, user design, construction (implementation) and cutover or testing."],
+    ["What is Axure RP?", "A tool for wireframes and interactive prototypes that can export HTML."],
+    ["Low fidelity vs high fidelity?", "Low fidelity is a rough layout. High fidelity looks close to the final product with colours and images."],
+    ["What are dynamic panels?", "Containers in Axure with several states, used for interactions like menus and tabs."],
+    ["Advantage of RAD?", "Faster delivery, early user feedback, easy to change."],
+    ["Disadvantage of RAD?", "Needs skilled team and active users. Not suitable for very large systems."]
+  ]
+},
+{
+  n: 7, date: "11.03.26", folder: "Exp7 Layout Colour Schemes", title: "GNU Image Manipulation Program (GIMP)",
+  aim: "To design and prototype a mobile app interface layout using digital image manipulation tools.",
+  body: [
+    H("Procedure"),
+    OL(["Workspace setup: initialize a new project canvas with dimensions suitable for a mobile screen.", "Layout structuring: use selection tools to define the main components of the interface.", "Layer organization: create separate layers for each interface component to ensure independent control over placement.", "Element application: use filling tools to apply basic colors to the defined sections and the text tool for labels.", "+ Make a second copy with a different colour scheme (for example blue and orange).", "+ Show both layouts to users and collect feedback on look and usability."])
+  ],
+  result: "The above procedure successfully created the user interface using the GIMP tool, and the colour schemes were compared.",
+  x: {
+    tool: "GIMP", where: "gimp.org, free download",
+    demo: ["Open the folder below and double-click <code class='k'>index.html</code>.", "Compare the blue and orange colour schemes and click the vote buttons to collect feedback."],
+    steps: [
+      "<b>File &rarr; New</b>, set width <code class='k'>360</code> and height <code class='k'>640</code> pixels (mobile size) and click OK.",
+      "Choose <b>Rectangle Select</b> (<code class='k'>R</code>) and mark areas for the header, the content and the bottom button.",
+      "<b>Layer &rarr; New Layer</b> (<code class='k'>Shift + Ctrl + N</code>) for each part and name them Header, Content, Button.",
+      "Select a layer, then use <b>Bucket Fill</b> (<code class='k'>Shift + B</code>) to colour its selection.",
+      "Use the <b>Text tool</b> (<code class='k'>T</code>) to type the app title and button label.",
+      "<b>Image &rarr; Duplicate</b>, then change the fills (or <b>Colors &rarr; Hue-Saturation</b>) to make the second colour scheme.",
+      "<b>File &rarr; Export As</b> and save both as PNG. Show them to two or three friends and note which they prefer."
+    ],
+    out: "The two PNG layouts side by side with the layers panel visible, and a short note on which colour scheme was preferred."
+  },
+  v: [
+    ["What is GIMP?", "GNU Image Manipulation Program, a free open source image editor."],
+    ["What are layers?", "Stacked transparent sheets; each can be edited separately."],
+    ["Why use separate layers for components?", "For independent control over placement and editing."],
+    ["Which tool fills colour?", "The Bucket Fill tool."],
+    ["What is a colour scheme?", "The set of colours used together in a design: primary, secondary and accent."],
+    ["What canvas size did you use?", "360 by 640 pixels, a common mobile screen size."],
+    ["Which formats can you export to?", "PNG and JPG. The native format is XCF."]
+  ]
+},
+{
+  n: 8, date: "07.04.26", folder: "Exp8 Storyboard", title: "Create Storyboards to Represent the User Flow for a Mobile App",
+  aim: "To create storyboards for a mobile E-commerce application using Balsamiq.",
+  body: [
+    H("Procedure"),
+    OL(["Open Balsamiq and create a new project.", "Add mobile screen layouts.", "Design the homepage with search bar and products.", "Create categories and product list screen.", "Design the product details screen with Add to Cart.", "Create the checkout screen with order details.", "Add the payment confirmation screen.", "Arrange the screens to show the user flow."])
+  ],
+  result: "The screens were arranged to form a storyboard successfully, showing the complete user flow.",
+  x: {
+    tool: "Balsamiq Wireframes", where: "balsamiq.com, use the free trial in Chrome",
+    demo: ["Open the folder below and double-click <code class='k'>index.html</code>.", "Click <b>Play user flow</b> to see the five screens light up in order."],
+    steps: [
+      "Create a new project and choose <b>Mobile (iOS)</b> as the template.",
+      "<b>Screen 1, Home:</b> drag a Search Bar, a title and 2 product boxes (Image + Label).",
+      "<b>Screen 2, Categories and Product List:</b> a list of categories and a list of products.",
+      "<b>Screen 3, Product Details:</b> big image, price, description and an <b>Add to Cart</b> button.",
+      "<b>Screen 4, Checkout:</b> order items, total and a <b>Pay</b> button. <b>Screen 5, Payment Confirmation:</b> a tick icon and the text <i>Order placed successfully</i>.",
+      "Select a button, in the properties panel set <b>Link to</b> the next screen.",
+      "Arrange all five screens left to right on one board and add arrows between them.",
+      "<b>Project &rarr; Export</b> as PNG or PDF."
+    ],
+    out: "The five screens in order with arrows: Home, Product List, Product Details, Checkout, Payment Confirmation."
+  },
+  v: [
+    ["What is a storyboard?", "A series of screens showing the steps a user takes through the app."],
+    ["What is Balsamiq?", "A low fidelity wireframing tool with a hand-drawn look."],
+    ["Storyboard vs wireframe?", "A wireframe is the layout of one screen. A storyboard shows the flow across many screens."],
+    ["Which screens are in your flow?", "Home, product list, product details, checkout, payment confirmation."],
+    ["Why make a storyboard?", "To see the flow, find problems early and explain the idea to the team."],
+    ["What is a user flow?", "The path a user takes to complete a task."],
+    ["What does fidelity mean?", "The level of detail in a design. Low is rough, high is close to final."]
+  ]
+},
+{
+  n: 9, date: "20.04.26", folder: "Exp9 Form Validation", title: "Design Input Forms that Validate Data and Display Error Messages",
+  aim: "To design and validate a form for email and phone number using HTML, CSS and JavaScript (Validator.js).",
+  body: [
+    H("Procedure"),
+    OL(["Create an HTML form with email and phone fields.", "Apply CSS for styling.", "Include the Validator.js library.", "Write JavaScript for validation.", "Display error messages for invalid inputs.", "Submit the form for valid inputs."]),
+    H("Program", true),
+    C("index.html", W9),
+    H("Output", true),
+    UL(["+ Wrong email or phone: the message shows <i>Invalid email</i> or <i>Invalid phone</i>.", "+ Correct values: the message <i>Form submitted</i> appears."])
+  ],
+  result: "Form validation was successful with correct error messages for invalid inputs.",
+  x: {
+    tool: "HTML + CSS + JavaScript", where: "Notepad or VS Code, and Chrome. Needs internet for the library link.",
+    steps: [
+      "Open the folder below. <code class='k'>index.html</code> is already there. (Or create a new file named <code class='k'>index.html</code> and paste the code.)",
+      "Double-click <code class='k'>index.html</code> to open it in Chrome.",
+      "<b>Test 1:</b> type <code class='k'>abc</code> in Email and <code class='k'>123</code> in Phone, click Submit. Red error messages appear.",
+      "<b>Test 2:</b> type <code class='k'>sherwin@gmail.com</code> and <code class='k'>9876543210</code>, click Submit. The green message <i>Form submitted successfully</i> appears."
+    ],
+    out: "Two screenshots: one with the red error messages and one with the green success message."
+  },
+  v: [
+    ["What is form validation?", "Checking that the user's input is correct before accepting it."],
+    ["What is Validator.js?", "A JavaScript library with ready functions like isEmail() and isMobilePhone()."],
+    ["Client side vs server side validation?", "Client side runs in the browser and is quick. Server side runs on the server and is safer. Real apps use both."],
+    ["Why use preventDefault()?", "It stops the form from submitting until the input has been checked."],
+    ["Which function checks an email?", "validator.isEmail()."],
+    ["What makes a good error message?", "Clear, specific and shown next to the field."],
+    ["Roles of HTML, CSS and JavaScript here?", "HTML builds the form, CSS styles it, JavaScript validates it."]
+  ]
+},
+{
+  n: 10, date: "21.04.26", folder: "Exp10 Data Visualization", title: "Create a Data Visualization for an Inventory Management System using JavaScript",
+  aim: "To create a pie chart and a bar graph for inventory data using JavaScript.",
+  body: [
+    H("Procedure"),
+    OL(["Create an HTML file with canvas elements.", "Include the Chart.js library.", "Define the inventory data.", "Create a pie chart for distribution.", "Create a bar graph to compare stock levels across categories.", "Add labels, colors and titles to the charts.", "Run the program in a browser."]),
+    H("Program", true),
+    C("index.html", W10),
+    H("Output", true),
+    UL(["+ A pie chart and a bar graph appear for Laptop, Phone and Tablet stock."])
+  ],
+  result: "Charts were generated successfully showing inventory distribution and comparison.",
+  x: {
+    tool: "HTML + JavaScript (Chart.js)", where: "Notepad or VS Code, and Chrome. Needs internet for the Chart.js link.",
+    steps: [
+      "Open the folder below. <code class='k'>index.html</code> is already there. (Or create a new file named <code class='k'>index.html</code> and paste the code.)",
+      "Double-click <code class='k'>index.html</code> to open it in Chrome.",
+      "The pie chart and the bar graph appear. To change the data, edit the <code class='k'>stock</code> numbers and press <code class='k'>F5</code>."
+    ],
+    out: "One screenshot of the browser showing both charts with titles and colours."
+  },
+  v: [
+    ["What is data visualization?", "Showing data as charts and graphs so it is easy to understand."],
+    ["What is Chart.js?", "An open source JavaScript library that draws charts on an HTML canvas."],
+    ["Pie chart vs bar graph?", "A pie chart shows each part's share of the whole. A bar graph compares values across categories."],
+    ["What is the canvas element for?", "It is the drawing area where the chart is painted."],
+    ["Why use a CDN link?", "To load the library from the internet without downloading it."],
+    ["Why visualise inventory data?", "To spot low stock and compare categories at a glance."],
+    ["What are the main parts of a Chart.js setup?", "The chart type, the data (labels and datasets) and the options (title, colours)."]
+  ]
+}
+];
+
+/* ---------------- rendering ---------------- */
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function inl(t) {
+  var i = t.indexOf(" + ");
+  if (/^\+ /.test(t)) return '<span class="add">' + t.slice(2) + "</span>";
+  if (i > 0) return t.slice(0, i) + ' <span class="add">' + t.slice(i + 3) + "</span>";
+  return t;
+}
+function codeBlock(name, code) {
+  return '<div class="codehead"><span>' + esc(name) + '</span><button class="copy" type="button">Copy</button></div><pre class="code"><code>' + esc(code) + "</code></pre>";
+}
+function writtenSheet(e) {
+  var h = "";
+  e.body.forEach(function (b) {
+    if (b.k === "h") h += "<h4>" + (b.add ? '<span class="add">' + esc(b.t) + "</span>" : esc(b.t)) + "</h4>";
+    else if (b.k === "p") h += "<p>" + inl(b.t) + "</p>";
+    else if (b.k === "ul" || b.k === "ol") h += "<" + b.k + ">" + b.a.map(function (x) { return "<li>" + inl(x) + "</li>"; }).join("") + "</" + b.k + ">";
+    else if (b.k === "c") h += codeBlock(b.name, b.code);
+  });
+  return '<article class="sheet" id="w' + e.n + '"><div class="margin"><b>' + e.n + '</b>Exp No.<br>Date: ' + e.date + '</div><div class="page"><h3>' + esc(e.title) + "</h3><h4>Aim</h4><p>" + esc(e.aim) + "</p>" + h +
+    '<div class="result"><h4>Result</h4><p>' + esc(e.result) + "</p></div></div></article>";
+}
+function execCard(e) {
+  var x = e.x, files = FILES[e.folder] || {}, names = Object.keys(files);
+  var h = '<article class="card" id="x' + e.n + '"><h3><span class="n">Exp ' + e.n + "</span>" + esc(e.title) + '</h3><div class="meta"><span class="pill">' + esc(x.tool) + '</span><span class="pill">' + esc(x.where) + "</span></div>";
+  var onlyHtml = names.length === 1 && names[0] === "index.html";
+  h += '<p class="sub">Files</p><div class="dlrow"><button class="dl" type="button" data-zip="' + e.n + '">Download Exp ' + e.n + ' files (zip)</button>' +
+    (onlyHtml ? '<button class="dl alt" type="button" data-html="' + e.n + '">Download index.html</button>' : "") + '<span class="dlmsg"></span></div>' +
+    '<span class="path">Also on your PC: Desktop\\ui\\lab\\Execution code\\' + esc(e.folder) + "\\</span>";
+  if (x.demo) {
+    h += '<p class="sub">Try it now</p><ol>' + x.demo.map(function (s) { return "<li>" + s + "</li>"; }).join("") + "</ol>";
+    h += '<details class="tool-steps"><summary>Steps in ' + esc(x.tool) + " (as done in the lab)</summary><div><ol>" + x.steps.map(function (s) { return "<li>" + s + "</li>"; }).join("") + "</ol></div></details>";
+  } else {
+    h += '<p class="sub">Steps</p><ol>' + x.steps.map(function (s) { return "<li>" + s + "</li>"; }).join("") + "</ol>";
+  }
+  (x.extra || []).forEach(function (c) { h += codeBlock(c[0], c[1]); });
+  names.forEach(function (n) { h += codeBlock(n, files[n]); });
+  h += '<div class="show"><b>Output to show:</b> ' + x.out + "</div></article>";
+  return h;
+}
+function vivaCard(e) {
+  return '<article class="card" id="v' + e.n + '"><h3><span class="n">Exp ' + e.n + "</span>" + esc(e.title) + "</h3>" +
+    e.v.map(function (q) { return '<details class="qa"><summary>' + esc(q[0]) + '</summary><div class="ans">' + esc(q[1]) + "</div></details>"; }).join("") + "</article>";
+}
+
+var panes = {
+  written: '<p class="legend">Copy this into your record. <mark class="off">Highlighted</mark> parts were added because they were missing from your observation. Your own wording is kept, only spelling and grammar are fixed.</p>' + E.map(writtenSheet).join(""),
+  exec: '<p class="legend">Download the files for an experiment, unzip, open the folder and double-click <b>index.html</b> (Exp 3 needs Python). The code is also shown below with copy buttons.</p>' +
+    '<div class="dlrow"><button class="dl" type="button" id="dlall">Download all 10 experiments (zip)</button><span class="dlmsg"></span></div>' + E.map(execCard).join(""),
+  viva: '<p class="legend">Tap a question, say your answer aloud first, then check it.</p>' + E.map(vivaCard).join("")
+};
+var prefix = { written: "w", exec: "x", viva: "v" };
+["written", "exec", "viva"].forEach(function (k) { document.getElementById(k).innerHTML = panes[k]; });
+
+var current = "written";
+function renderChips() {
+  document.getElementById("chips").innerHTML = E.map(function (e) {
+    return '<a href="#' + prefix[current] + e.n + '" title="Exp ' + e.n + '">' + e.n + "</a>";
+  }).join("");
+}
+function renderTool() {
+  var t = document.getElementById("tool");
+  if (current === "written") {
+    t.innerHTML = '<label><input type="checkbox" id="addbox" checked> Highlight added parts</label>';
+    document.getElementById("addbox").onchange = function () { document.body.classList.toggle("noadd", !this.checked); };
+  } else if (current === "viva") {
+    t.innerHTML = '<button type="button" id="openall">Open all answers</button><button type="button" id="closeall">Close all</button>';
+    document.getElementById("openall").onclick = function () { document.querySelectorAll("#viva details").forEach(function (d) { d.open = true; }); };
+    document.getElementById("closeall").onclick = function () { document.querySelectorAll("#viva details").forEach(function (d) { d.open = false; }); };
+  } else t.innerHTML = "";
+}
+function show(tab) {
+  current = tab;
+  ["written", "exec", "viva"].forEach(function (k) { document.getElementById(k).hidden = k !== tab; });
+  document.querySelectorAll(".tab").forEach(function (b) { b.setAttribute("aria-selected", b.dataset.t === tab ? "true" : "false"); });
+  renderChips(); renderTool();
+}
+document.querySelectorAll(".tab").forEach(function (b) { b.onclick = function () { show(b.dataset.t); window.scrollTo(0, 0); }; });
+document.addEventListener("click", function (ev) {
+  var b = ev.target.closest && ev.target.closest(".copy");
+  if (!b) return;
+  var pre = b.parentNode.nextElementSibling;
+  var done = function () { b.textContent = "Copied"; setTimeout(function () { b.textContent = "Copy"; }, 1400); };
+  var fallback = function () {
+    var r = document.createRange(); r.selectNodeContents(pre);
+    var s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Selected, press Ctrl+C";
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(pre.textContent).then(done, fallback); else fallback();
+});
+/* downloads: only shown when the viewer allows saving files */
+var DL = null;
+if (window.claude && window.claude.use) {
+  window.claude.use("downloads").then(function (d) {
+    DL = d;
+    if (d) document.body.classList.add("can-dl");
+  }, function () {});
+} else {
+  /* opened as a plain file on the PC: save with a normal browser download */
+  DL = {
+    save: function (r) {
+      var blob = r.data instanceof Blob ? r.data : new Blob([r.data], { type: "text/plain" });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = r.filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      return Promise.resolve({ status: "saved" });
+    }
+  };
+  document.body.classList.add("can-dl");
+}
+function buildZip(list) {
+  var z = new JSZip();
+  list.forEach(function (e) { Object.keys(FILES[e.folder]).forEach(function (n) { z.file(e.folder + "/" + n, FILES[e.folder][n]); }); });
+  return z.generateAsync({ type: "blob" });
+}
+function saveFile(btn, filename, data) {
+  var msg = btn.parentNode.querySelector(".dlmsg");
+  msg.textContent = "";
+  btn.disabled = true;
+  return DL.save({ filename: filename, data: data }).then(function () {
+    msg.textContent = "Saved";
+  }, function (err) {
+    msg.textContent = err && err.code === "declined" ? "Cancelled" : "Could not save here. Copy the code below instead.";
+  }).then(function () { btn.disabled = false; });
+}
+document.addEventListener("click", function (ev) {
+  var d = ev.target.closest && ev.target.closest(".dl");
+  if (!d || !DL) return;
+  var e = d.dataset.zip ? E[d.dataset.zip - 1] : d.dataset.html ? E[d.dataset.html - 1] : null;
+  if (d.id === "dlall") buildZip(E).then(function (b) { saveFile(d, "UID Lab Execution code.zip", b); });
+  else if (d.dataset.zip) buildZip([e]).then(function (b) { saveFile(d, e.folder + ".zip", b); });
+  else if (d.dataset.html) saveFile(d, e.folder + ".html", FILES[e.folder]["index.html"]);
+});
+show("written");
+</script>
+
+</body></html>
